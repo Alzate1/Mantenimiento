@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\DB;
 
 class AnalistaController extends Controller
 {
-    function craeateReport(Request $request){
+    function craeateReport(Request $request)
+    {
         try {
             $user = auth()->user();
             $interno = $request->input('nro_interno');
@@ -54,7 +55,8 @@ class AnalistaController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    function tableAnalist(Request $request){
+    function tableAnalist(Request $request)
+    {
         $pagination = $request->input('per_page', 25);
 
         // Filtra informes por la ruta si el checkbox está marcado
@@ -111,24 +113,25 @@ class AnalistaController extends Controller
         return view('tables.tableInforme', ['informe' => $informe, 'date' => $dateInfo, 'rutaCorinto' => $rutaCorinto, 'rutaPalmira' => $rutaPalmira]);
     }
 
-    function viewDesc(Request $request, $id){
-    $informe = Informe::find($id);
-    if ($informe) {
-        $items = InformeItem::where('id_informe', $id)->get();
-        $itemsDetails = $items->map(function($item) {
-            $itemDetail = Item::find($item->id_item);
-            return $itemDetail ? $itemDetail->nombre : 'Nombre no encontrado';
-        });
+    function viewDesc(Request $request, $id)
+    {
+        $informe = Informe::find($id);
+        if ($informe) {
+            $items = InformeItem::where('id_informe', $id)->get();
+            $itemsDetails = $items->map(function ($item) {
+                $itemDetail = Item::find($item->id_item);
+                return $itemDetail ? $itemDetail->nombre : 'Nombre no encontrado';
+            });
 
-        return response()->json([
-            'success' => true,
-            'desc' => $informe->descripcion,
-            'estado' => $informe->estado,
-            'items' => $itemsDetails
-        ]);
-    } else {
-        return response()->json(['success' => false, 'error' => 'Not Found']);
-    }
+            return response()->json([
+                'success' => true,
+                'desc' => $informe->descripcion,
+                'estado' => $informe->estado,
+                'items' => $itemsDetails
+            ]);
+        } else {
+            return response()->json(['success' => false, 'error' => 'Not Found']);
+        }
     }
     public function NewState(Request $request, $id)
     {
@@ -177,7 +180,7 @@ class AnalistaController extends Controller
         try {
             $request->validate(
                 [
-                    'item' => 'required|string|max:255|unique:item,nombre',
+                    'newitem' => 'required|string|max:255|unique:item,nombre',
                 ],
                 [
                     'item.unique' => 'El nombre del item ya existe.',
@@ -187,7 +190,7 @@ class AnalistaController extends Controller
             );
 
             $items = new Item();
-            $items->nombre = $request->input('item');
+            $items->nombre = $request->input('newitem');
             $items->descripcion = $request->input('desc_item');
             $items->save();
             return response()->json(['success' => true]);
@@ -206,28 +209,33 @@ class AnalistaController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    function editInforme($id){
+    function editInforme($id)
+    {
         try {
             $informe = Informe::find($id);
+            if (!$informe) {
+                return redirect()->route('home');
+            }
             $allItems = Item::all();
             $allTipoInforme = TipoInforme::all();
             $vehiculo = Vehiculo::find($informe->id_vehiculo);
             $tipoInforme = TipoInforme::find($informe->id_tipo_informe);
-            if(!$informe){
-                return redirect()->route('home');
-            }
+            $relatedItems = InformeItem::where('id_informe',$id)->pluck('id_item')->toArray();
 
-                return view('update.updateInforme',[
-                    'informe'=>$informe,
-                    'allItems'=>$allItems,
-                    'allTipoInforme'=>$allTipoInforme,
-                    'vehiculo' => $vehiculo,
-                    'tipoInforme'=>$tipoInforme,
-
-                ]);
+            return view('update.updateInforme', [
+                'informe' => $informe,
+                'allItems' => $allItems,
+                'allTipoInforme' => $allTipoInforme,
+                'vehiculo' => $vehiculo,
+                'tipoInforme' => $tipoInforme,
+                'relatedItems'=>$relatedItems,
+            ]);
 
         } catch (\Throwable $th) {
             //throw $th;
         }
+    }
+    function updateInforme(Request $request){
+        
     }
 }

@@ -36,7 +36,7 @@ class MantenimientoController extends Controller
         $user = Users::whereIn("idtipo_usuario", [1, 2, 3])->where('estado', 1)->get();
         return view('create.createMant', ['user' => $user]);
 
-    }
+    } 
 
     public function busquedaPorInterno($nroInterno)
     {

@@ -24,13 +24,8 @@ document.addEventListener("DOMContentLoaded", () => {
     //CIERRA BLOQUE
 
     //BLOQUE PARA MOSTRA U OCULTA LOS ITEMS
-    const blockItems = document.getElementById('blockItems')
-    const noneItems = document.getElementById('noneItems')
-    const viewItems = document.getElementById('viewItems')
-    const blockItemsView = document.getElementById('blockItemsView')
-    const noneItemsView = document.getElementById('noneItemsView')
     $('#saveItem').on('click', function (e) {
-        var item = $('#item').val();
+        var item = $('#newitem').val();
         var descripcion = $('#desc_item').val();
         e.preventDefault();
         if (item === '' || item === null) {
@@ -47,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 type: "POST",
                 url: "/crear/item",
                 data: {
-                    item: item,
+                    newitem: item,
                     desc_item: descripcion
                 }, headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -70,8 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         position: "center",
                         icon: "error",
                         title: error.error,
-                        showConfirmButton: false,
-                        timer: 2500
+                        // showConfirmButton: false,
+                        // timer: 2500
                     });
                 }
             });

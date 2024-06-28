@@ -6,6 +6,17 @@
 
 @section('contenido')
 <section>
+    <style>
+        .form-check {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .form-check > div {
+            margin-right: 10px;
+            margin-bottom: 10px;
+            flex: 1 1 auto; /* Esto permitirá que los elementos se ajusten y envuelvan según sea necesario */
+        }
+    </style>
     <div class="container card">
         <div class="Content col-12">
             <form action="{{ route('createReport') }}" method="post" id="formCreate">
@@ -126,8 +137,8 @@
                                             <div class="row">
                                                 <div class="col-md-6 mb-2">
                                                     <label for="item" class="form-label">Nombre del Item</label>
-                                                    <input type="text" class="form-control form-control-lg" id="item"
-                                                        name="item" placeholder="Ingrese el Item">
+                                                    <input type="text" class="form-control form-control-lg" id="newitem"
+                                                        name="newitem" placeholder="Ingrese el Item">
                                                 </div>
                                                 <div class="col-md-6 mb-2">
                                                     <label for="item" class="form-label">Descripción del
@@ -150,7 +161,7 @@
                     </div>
                     <div class="col-md-12">
                         <div class="button-form">
-                            <button type="button" id="volverAlist" class="btnCancel">Cancelar</button>
+                            <button type="button" id="volverAnalist" class="btnCancel">Cancelar</button>
 
                             <button type="submit" id="registrar" class="btnSave">
                                 Guardar Informe
@@ -165,7 +176,12 @@
     </div>
     <script src="{{ asset('js/createInfo.js') }}"> </script>
     <script>
-        var analista = "{{ route('analistas') }}"
+         document.addEventListener('DOMContentLoaded', function(){
+            document.getElementById('volverAnalist').addEventListener('click',(e)=>{
+                window.location.href ="{{ route('analistas') }}"
+            })
+        })
+
     </script>
 
 </section>
