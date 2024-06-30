@@ -95,6 +95,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('crear/item',[AnalistaController::class,'createItems']);
         Route::post('/route/date/update-state/{id}', [AnalistaController::class, 'NewState'])->name('updateState');
         Route::get('Actualizar/Informe/{id}',[AnalistaController::class,'editInforme'])->name('Actualizar');
+        Route::put('edit/informe/{id}',[AnalistaController::class,'updateInforme'])->name('informe.update');
     });
 });
 

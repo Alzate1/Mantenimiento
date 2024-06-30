@@ -17,7 +17,9 @@
         }
     </style>
     <div class="Content col-12">
-        <form action="">
+        <form method="POST" action="{{ route('informe.update',$informe->idinforme) }}" id="updateInforme">
+            @csrf
+            @method('PUT')
             <details open >
                 <summary>
                     <small>
@@ -47,7 +49,7 @@
                         </div>
                         <div class="col-md-6 mb-4">
                             <label class="form-label">Descripción</label>
-                            <textarea class="form-control" placeholder="Digite la descripción" id="floatingTextarea">
+                            <textarea class="form-control" placeholder="Digite la descripción" id="desc" name="descripcion">
                                 {{ $informe->descripcion }}
                             </textarea>
 
@@ -72,7 +74,7 @@
                             <button type="button" id="volverAnalist" class="btnCancel">Cancelar</button>
 
                             <button type="submit" id="registrar" class="btnSave">
-                                Guardar Informe
+                                Actualizar Informe
                             </button>
                         </div>
                     </div>
@@ -89,7 +91,107 @@
                 // var vehiculo =
                 window.location.href ="{{ route('analistas') }}"
             })
+            $('#updateInforme').submit(function (event) {
+            event.preventDefault();
+            var desc = $("#desc").val().trim();
+            var fecha = $("#date").val();
+            var nroInterno = $('#nro_interno').val();
+            var idTipoInfo = $('#idTipoInfo').val();
+            var item = $('.form-check-input:checked').length > 0;
+            if (nroInterno === '' || nroInterno === null) {
+            Swal.fire({
+                position: "center",
+                icon: "info",
+                title: "Debes ingresar el numero de interno",
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return false;
+            } if (fecha === '' || fecha === null) {
+            Swal.fire({
+                position: "center",
+                icon: "info",
+                title: "Debes ingresar la fecha",
+                showConfirmButton: false,
+                timer: 1500
+            });
+            return false;
+            } if (idTipoInfo == '' || idTipoInfo == null  || idTipoInfo == 'Tipo de Informe') {
+            Swal.fire({
+                icon: 'info',
+                title: 'Seleccionar el Informe',
+                text: 'Debe seleccionar al menos un tipo de Informe.',
+            });
+            return false;
+            }if (!item) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Seleccionar Item',
+                text: 'Debe seleccionar al menos un item.',
+            });
+            return false;
+            }
+            if (desc === '' || desc === null) {
+            Swal.fire({
+                position: "center",
+                icon: "info",
+                title: "Debes ingresar la descripción",
+                showConfirmButton: false,
+                timer: 1500
+            });
+                return false;
+            }
+            else {
+                $.ajax({
+                method: $(this).attr('method'),
+                url: $(this).attr('action'),
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (data) {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Cargando...',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            timer: 3500
 
+                        }).then(function () {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Correcto',
+                                text: 'Informe registrado correctamente',
+                                showCancelButton: true,
+                            }).then(function() {
+                                window.location.href ="{{ route('analistas') }}"
+                            })
+                        })
+
+                    } if (data.notVehicle) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No existe el numero de Interno',
+                        });
+
+                    }
+                },
+                error: function (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un error al registrar el Informe',
+                    });
+                }
+
+            });
+        }
+
+    });
 
         })
 

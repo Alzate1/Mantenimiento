@@ -235,7 +235,50 @@ class AnalistaController extends Controller
             //throw $th;
         }
     }
-    function updateInforme(Request $request){
-        
+    function updateInforme(Request $request,$id){
+        $informe = Informe::find($id);
+        if (!$informe) {
+            return redirect()->route('home');
+        }
+
+        // Validar la existencia del vehículo por número de interno
+        $vehiculo = Vehiculo::where('nro_interno', $request->input('nro_interno'))->first();
+        if (!$vehiculo) {
+            return response()->json(['notVehicle' => true]);
+        }
+
+        // Actualizar los datos del informe
+        $informe->descripcion = $request->input('descripcion');
+        $informe->id_vehiculo = $vehiculo->idvehiculo;
+        $informe->id_tipo_informe = $request->input('idTipoInfo');
+        $informe->save();
+
+        // Actualizar los ítems relacionados
+        // Obtener los ítems seleccionados
+        $newItems = $request->input('itemselect');
+
+        // Obtener los ítems actuales del informe
+        $currentItems = InformeItem::where('id_informe', $id)->pluck('id_item')->toArray();
+
+        // Determinar los ítems a eliminar y los ítems a agregar
+        $itemsToDelete = array_diff($currentItems, $newItems);
+        $itemsToAdd = array_diff($newItems, $currentItems);
+
+        // Eliminar los ítems que ya no están seleccionados
+        InformeItem::where('id_informe', $id)
+                    ->whereIn('id_item', $itemsToDelete)
+                    ->delete();
+
+        // Agregar los nuevos ítems seleccionados
+        foreach ($itemsToAdd as $itemId) {
+            DB::table('informe_item')->insert([
+                'id_informe' => $informe->idinforme,
+                'id_item' => $itemId,
+                'fecha' => now()
+            ]);
+        }
+
+        return response()->json(['success'=>true]);
+
     }
 }
