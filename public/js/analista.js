@@ -135,54 +135,55 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    // var tableAlist = $('#tableMotorista');
-    // var inputBusqueda = $('#searchData');
-    // var filaNoResultados = $('#filaNoResultados');
+    var tableAlist = $('#tableAnalista');
+    var inputBusqueda = $('#searchData');
+    var filaNoResultados = $('#filaNoResultados');
 
-    // var filas = tableAlist.find('tbody tr');
+    var filas = tableAlist.find('tbody tr');
 
-    // inputBusqueda.on('input', function () {
-    //     var valorBusqueda = inputBusqueda.val().toLowerCase();
+    inputBusqueda.on('input', function () {
+        var valorBusqueda = inputBusqueda.val().toLowerCase();
 
-    //     var filasFiltradas = filas.filter(function () {
-    //         return $(this).text().toLowerCase().indexOf(valorBusqueda) > -1;
-    //     });
+        var filasFiltradas = filas.filter(function () {
+            return $(this).text().toLowerCase().indexOf(valorBusqueda) > -1;
+        });
 
-    //     filaNoResultados.toggle(filasFiltradas.length === 0);
+        filaNoResultados.toggle(filasFiltradas.length === 0);
 
-    //     filas.hide();
-    //     filasFiltradas.show();
-    // });
-    // $('form').submit(function (e) {
-    //     e.preventDefault();
-    // });
-    // $('#pos,#nombre,#apellido,#documento').on('click', function (e) {
-    //     var column = $(this);
-    //     var order = column.data('order') || 'asc';
-    //     var indexColmn = column.index();
-    //     var orderedRow = filas.toArray().sort(function (filaA, filaB) {
-    //         var valueA = $(filaA).find('td').eq(indexColmn).text();
-    //         var valueB = $(filaB).find('td').eq(indexColmn).text();
-    //         return (order === 'asc' ? 1 : -1) * valueA.localeCompare(valueB);
-    //     });
+        filas.hide();
+        filasFiltradas.show();
+    });
+    $('form').submit(function (e) {
+        e.preventDefault();
+    });
+    $('#pos,#interno,#responsable,#fecha,#ruta,#descrip').on('click', function (e) {
 
-
-    //     filas.detach().sort(function (filaA, filaB) {
-    //         var valueA = $(filaA).find('td').eq(indexColmn).text();
-    //         var valueB = $(filaB).find('td').eq(indexColmn).text();
-    //         return (order === 'asc' ? 1 : -1) * valueA.localeCompare(valueB);
-    //     }).appendTo(tableAlist.find('tbody'));
+        var column = $(this);
+        var order = column.data('order') || 'asc';
+        var indexColmn = column.index();
+        var orderedRow = filas.toArray().sort(function (filaA, filaB) {
+            var valueA = $(filaA).find('td').eq(indexColmn).text();
+            var valueB = $(filaB).find('td').eq(indexColmn).text();
+            return (order === 'asc' ? 1 : -1) * valueA.localeCompare(valueB);
+        });
 
 
-    //     $('#pos,#nombre,#apellido,#documento').not(column).data('order', null);
-    //     $('#pos,#nombre,#apellido,#documento').find('i').removeClass().addClass('fas fa-sort');
+        filas.detach().sort(function (filaA, filaB) {
+            var valueA = $(filaA).find('td').eq(indexColmn).text();
+            var valueB = $(filaB).find('td').eq(indexColmn).text();
+            return (order === 'asc' ? 1 : -1) * valueA.localeCompare(valueB);
+        }).appendTo(tableAlist.find('tbody'));
 
 
-    //     column.find('i').removeClass().addClass(order === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down');
+        $('#pos,#interno,#responsable,#fecha,#ruta,#descrip').not(column).data('order', null);
+        $('#pos,#interno,#responsable,#fecha,#ruta,#descrip').find('i').removeClass().addClass('fas fa-sort');
 
-    //     column.data('order', order === 'asc' ? 'desc' : 'asc');
 
-    // });
+        column.find('i').removeClass().addClass(order === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down');
+
+        column.data('order', order === 'asc' ? 'desc' : 'asc');
+
+    });
 
 
     // var edit = $('.editMotorista')
@@ -245,6 +246,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const filterForm = document.getElementById("filter_form");
     const checkPalmira = document.getElementById("checkPalmira");
     const filterFormp = document.getElementById("filter_formp");
+    const checkMensual = document.getElementById("checkMensual");
+    const filterFormMen = document.getElementById("filter_formMen");
+    const checkTrimestral = document.getElementById("checkTrimestral");
+    const filter_formTri = document.getElementById("filter_formTri");
+    const checkAnual = document.getElementById("checkAnual");
+    const filter_formAn = document.getElementById("filter_formAn");
+
+
     checkCorinto.addEventListener("change", (e) => {
         e.preventDefault(); // Previene el envío inmediato del formulario
         Swal.fire({
@@ -267,6 +276,40 @@ document.addEventListener('DOMContentLoaded', function () {
             filterFormp.submit();
         })
     })
+    checkMensual.addEventListener("change", (e)=>{
+        e.preventDefault(); // Previene el envío inmediato del formulario
+        Swal.fire({
+            title: 'Cargando...',
+            text: 'Por favor Esperar',
+            timer: 3500,
+            showConfirmButton: false,
+        }).then(function(){
+            filterFormMen.submit();
+        })
+    })
+    checkTrimestral.addEventListener("change", (e)=>{
+        e.preventDefault(); // Previene el envío inmediato del formulario
+        Swal.fire({
+            title: 'Cargando...',
+            text: 'Por favor Esperar',
+            timer: 3500,
+            showConfirmButton: false,
+        }).then(function(){
+            filter_formTri.submit();
+        })
+    })
+    checkAnual.addEventListener("change", (e)=>{
+        e.preventDefault(); // Previene el envío inmediato del formulario
+        Swal.fire({
+            title: 'Cargando...',
+            text: 'Por favor Esperar',
+            timer: 3500,
+            showConfirmButton: false,
+        }).then(function(){
+            filter_formAn.submit();
+        })
+    })
+
     $(document).on('click','#deleteInfo', function(){
         var id = $(this).data('id');
         var interno = $(this).data('interno');

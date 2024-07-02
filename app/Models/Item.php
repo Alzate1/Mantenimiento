@@ -17,9 +17,4 @@ class Item extends Model
     }
 
     // Relación con los mantenimientos
-    public function mantenimientos()
-    {
-        return $this->belongsToMany(Mantenimiento::class, 'mantenimiento_item', 'id_item', 'id_mantenimiento')
-                    ->withPivot('estado');
-    }
 }

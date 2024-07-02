@@ -124,85 +124,75 @@
                 </a>
                 @endif
             </div>
-            <div class="row d-flex col-10">
-                <div class="col-sm-6 col-md-3">
-                    <div>
-                        <form id="pagination_form" action="{{ route('analistas') }}" method="get">
-                            <label for="pagination_limit" class="form-inline mb-2" style="margin-left: 15px;">mostrar
-                                <select name="per_page" class="custom-select" id="pagination_limit"
-                                    onchange="document.getElementById('pagination_form').submit()">
-                                    <option value="25" @if($informe->perPage() == 25) selected @endif>25</option>
-                                    <option value="50" @if($informe->perPage() == 50) selected @endif>50</option>
-                                    <option value="75" @if($informe->perPage() == 75) selected @endif>75</option>
-                                </select>
-                                registros
+            <div class="row d-flex col-12">
+                <div class="container">
+                    <div class="row mt-1">
+                        <div class="col-md-6">
+                            <form id="pagination_form" action="{{ route('analistas') }}" method="get">
+                                <label for="pagination_limit" class="form-inline mb-2">
+                                    Mostrar
+                                    <select name="per_page" class="custom-select ml-2" id="pagination_limit"
+                                        onchange="document.getElementById('pagination_form').submit()">
+                                        <option value="25" @if($informe->perPage() == 25) selected @endif>25</option>
+                                        <option value="50" @if($informe->perPage() == 50) selected @endif>50</option>
+                                        <option value="75" @if($informe->perPage() == 75) selected @endif>75</option>
+                                    </select>
+                                    registros
+                                </label>
+                            </form>
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <label class="form-inline" style="float: right;">Buscar:
+                                <input type="search" class="custom-select" placeholder="Dato a buscar" id="searchData">
                             </label>
-                        </form>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-2 col-md-2 mt-2 ">
-                    <div>
-                        <form id="filter_form" action="{{ route('analistas') }}" method="get">
-                            <input type="hidden" name="per_page" value="{{ $informe->perPage() }}">
-                            <label class="form-inline mb-2" style="float: right;">Corinto
-                                <input type="checkbox" name="corinto" id="checkCorinto"
-                                    onchange="document.getElementById('filter_form').submit()" @if(request('corinto'))
-                                    checked @endif>
-                            </label>
-                        </form>
-                    </div>
-                </div>
-                <div class="col-sm-2 col-md-2 mt-2">
-                    <div>
-                        <form id="filter_formp" action="{{ route('analistas') }}" method="get">
-                            <input type="hidden" name="per_page" value="{{ $informe->perPage() }}">
-                            <label class="form-inline mb-2" style="float: right;">Palmira
-                                <input type="checkbox" name="palmira" id="checkPalmira"
-                                    onchange="document.getElementById('filter_formp').submit()" @if(request('palmira'))
-                                    checked @endif>
-                            </label>
-                        </form>
-                    </div>
-                </div>
-                <div class="col-sm-2 col-md-2 mt-2 align-content-lg-start">
-                    <div>
-                        <form id="filter_form" action="{{ route('analistas') }}" method="get">
-                            <input type="hidden" name="per_page" value="{{ $informe->perPage() }}">
-                            <label class="form-inline mb-2" style="float: right;">Mensual
-                                <input type="checkbox" name="corinto" id="checkCorinto"
-                                    onchange="document.getElementById('filter_form').submit()" @if(request('corinto'))
-                                    checked @endif>
-                            </label>
-                        </form>
-                    </div>
-                </div>
-                <div class="col-sm-2 col-md-2 mt-2">
-                    <div>
-                        <form id="filter_form" action="{{ route('analistas') }}" method="get">
-                            <input type="hidden" name="per_page" value="{{ $informe->perPage() }}">
-                            <label class="form-inline mb-2" style="float: right;">Trimestral
-                                <input type="checkbox" name="corinto" id="checkCorinto"
-                                    onchange="document.getElementById('filter_form').submit()" @if(request('corinto'))
-                                    checked @endif>
-                            </label>
-                        </form>
-                    </div>
-                </div>
-                <div class="col-sm-2 col-md-1 mt-2">
-                    <div>
-                        <form id="filter_form" action="{{ route('analistas') }}" method="get">
-                            <input type="hidden" name="per_page" value="{{ $informe->perPage() }}">
-                            <label class="form-inline mb-2" style="float: right;">anual
-                                <input type="checkbox" name="corinto" id="checkCorinto"
-                                    onchange="document.getElementById('filter_form').submit()" @if(request('corinto'))
-                                    checked @endif>
-                            </label>
-                        </form>
-                    </div>
+
+                    <form id="filter_form" action="{{ route('analistas') }}" class="form-inline d-flex" method="get">
+                        <input type="hidden" name="per_page" value="{{ $informe->perPage() }}">
+
+                        <div class="col-md-2 text-center">
+                            <label class="">Corinto</label>
+                            <input type="checkbox" name="corinto" id="checkCorinto"
+                                onchange="document.getElementById('filter_form').submit()" @if(request('corinto'))
+                                checked @endif>
+                        </div>
+
+                        <div class="col-md-2 text-center">
+                            <label>Palmira</label>
+                            <input type="checkbox" name="palmira" id="checkPalmira"
+                                onchange="document.getElementById('filter_form').submit()" @if(request('palmira'))
+                                checked @endif>
+                        </div>
+
+                        <div class="col-md-2 text-center">
+                            <label>Mensual</label>
+                            <input type="checkbox" name="mensual" id="checkMensual"
+                                onchange="document.getElementById('filter_form').submit()" @if(request('mensual'))
+                                checked @endif>
+                        </div>
+
+                        <div class="col-md-2 text-center">
+                            <label>Trimestral</label>
+                            <input type="checkbox" name="trimestral" id="checkTrimestral"
+                                onchange="document.getElementById('filter_form').submit()" @if(request('trimestral'))
+                                checked @endif>
+                        </div>
+
+                        <div class="col-md-1.5 text-center">
+                            <label>Anual</label>
+                            <input type="checkbox" name="anual" id="checkAnual"
+                                onchange="document.getElementById('filter_form').submit()" @if(request('anual')) checked
+                                @endif>
+
+                        </div>
+
+                    </form>
                 </div>
                 <!-- Otros filtros -->
+
             </div>
-            <table class="table table-striped table-hover text-center" id="tableMotorista">
+            <table class="table table-striped table-hover text-center" id="tableAnalista">
                 <thead class="theadMantenmiento">
                     <tr>
                         <th id="pos" class="thC">#</th>
@@ -210,7 +200,7 @@
                         <th id="responsable" class="thC">Responsable</th>
                         <th id="fecha" class="thC">Fecha</th>
                         <th id="ruta" class="thC">Ruta</th>
-                        <th class="thC">Descripción</th>
+                        <th id="descrip"class="thC">Descripción</th>
                         @if (auth()->check() && (auth()->user()->idtipo_usuario == 1 || auth()->user()->idtipo_usuario
                         == 4 ))
                         <th>Editar</th>
@@ -241,8 +231,8 @@
                         == 4 ))
 
                         <td>
-                            <a href="{{ route('Actualizar',$items->idinforme) }}" type="button" data-id="{{ $items->idinforme }}"><i
-                                    class="bi bi-pencil-square Objets"></i></a>
+                            <a href="{{ route('Actualizar',$items->idinforme) }}" type="button"
+                                data-id="{{ $items->idinforme }}"><i class="bi bi-pencil-square Objets"></i></a>
                         </td>
                         @endif
                         @if (auth()->check() && auth()->user()->idtipo_usuario == 1)
@@ -384,7 +374,7 @@
                         </div>
                     </div>
                     <div class="container Content">
-                        <div class="row" >
+                        <div class="row">
                             <div class="col-md-6 mt-2">
                                 <label>Item:</label>
                                 <ul class="list-group mb-2 mt-2">
@@ -392,20 +382,19 @@
                                 </ul>
                             </div>
 
-                                <div class="col-md-3 mt-3">
-                                    <div class="form-group">
-                                        <label class="form-inline">
-                                            Estado Bitácora:
-                                        </label>
-                                    </div>
+                            <div class="col-md-3 mt-3">
+                                <div class="form-group">
+                                    <label class="form-inline">
+                                        Estado Bitácora:
+                                    </label>
                                 </div>
-                                <div class="col-md-3 mt-3">
-                                    <div class="form-group">
-                                        <input  type="radio" name="state" value="0"> Pendiente
-                                        <input  type="radio" name="state" value="1"> Realizado
-                                    </div>
+                            </div>
+                            <div class="col-md-3 mt-3">
+                                <div class="form-group">
+                                    <input type="radio" name="state" value="0"> Pendiente
+                                    <input type="radio" name="state" value="1"> Realizado
                                 </div>
-
+                            </div>
 
                         </div>
                     </div>

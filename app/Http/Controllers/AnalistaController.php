@@ -62,14 +62,22 @@ class AnalistaController extends Controller
         // Filtra informes por la ruta si el checkbox está marcado
         $rutaCorinto = $request->input('corinto', false);
         $rutaPalmira = $request->input('palmira', false);
+        $mensual =  $request->input('mensual',false);
+        $trimestral =  $request->input('trimestral',false);
+        $anual = $request->input('anual',false);
         $query = Informe::query();
+
         $query->whereHas('vehiculo', function ($q) {
             $q->whereIn('id_ruta', [6, 7]);
         });
 
+        $query->whereHas('tipo_informe', function ($q) {
+            $q->whereIn('id_tipo_informe', [1, 2, 3, 4]);
+        });
+
         if ($rutaCorinto) {
             $query->whereHas('vehiculo', function ($q) {
-                $q->where('id_ruta', 7); // Filtra por la ruta con ID 6
+                $q->where('id_ruta', 7); // Filtra por la ruta con ID 7
             });
         }
         if ($rutaPalmira) {
@@ -77,6 +85,21 @@ class AnalistaController extends Controller
                 $q->where('id_ruta', 6); // Filtra por la ruta con ID 6
             });
         }
+        if($mensual){
+            $query->whereHas('tipo_informe', function ($q) {
+                $q->where('id_tipo_informe', 2);
+            });
+        }
+        if($trimestral){
+            $query->whereHas('tipo_informe', function ($q) {
+                $q->where('id_tipo_informe', 3);
+            });
+        }
+            if($anual){
+                $query->whereHas('tipo_informe', function ($q) {
+                    $q->where('id_tipo_informe', 4);
+                });
+            }
         $informe = $query->orderBy('created_at', 'desc')->paginate($pagination);
         $dateInfo = [];
         $currentPage = $informe->currentPage();
@@ -89,6 +112,7 @@ class AnalistaController extends Controller
             $vehiculo = Vehiculo::find($idvehiculo);
             $user = Users::find($iduser);
             $ruta = Ruta::find($vehiculo->id_ruta);
+
             $infoData = new stdClass();
             $infoData->idinforme = $date->idinforme;
             $infoData->fecha = $date->fecha;
@@ -97,13 +121,41 @@ class AnalistaController extends Controller
             $infoData->usuario = $user->nombre_usuario . " " . $user->apellido;
             $infoData->interno = $vehiculo->nro_interno;
             $infoData->position = $startPosition;
-            if ($date->estado == 0) {
-                $infoData->style = 'color:red;';
-                $infoData->texto = 'Informe Diario: pendiente';
+            if($date->id_tipo_informe ==1 ){
+                if ($date->estado == 0) {
+                    $infoData->style = 'color:red;';
+                    $infoData->texto = 'Informe Diario: pendiente';
 
-            } else {
-                $infoData->style = '';
+                } else {
+                    $infoData->style = '';
+                }
+            }else if($date->id_tipo_informe ==2){
+                if ($date->estado == 0) {
+                    $infoData->style = 'color:#E36000  ;';
+                    $infoData->texto = 'Informe Mensual: pendiente';
+
+                } else {
+                    $infoData->style = '';
+                }
             }
+            if($date->id_tipo_informe ==3 ){
+                if ($date->estado == 0) {
+                    $infoData->style = 'color:red;';
+                    $infoData->texto = 'Informe Trimestral: pendiente';
+
+                } else {
+                    $infoData->style = '';
+                }
+            }else if($date->id_tipo_informe ==4){
+                if ($date->estado == 0) {
+                    $infoData->style = 'color:#E36000  ;';
+                    $infoData->texto = 'Informe Anual: pendiente';
+
+                } else {
+                    $infoData->style = '';
+                }
+            }
+
 
 
             $dateInfo[] = $infoData;

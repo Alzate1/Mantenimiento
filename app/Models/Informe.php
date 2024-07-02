@@ -12,6 +12,10 @@ class Informe extends Model
     {
         return $this->belongsTo(Vehiculo::class, 'id_vehiculo','idvehiculo');
     }
+    public function tipo_informe()
+    {
+        return $this->belongsTo(TipoInforme::class, 'id_tipo_informe','id');
+    }
     public function items()
     {
         return $this->hasMany(InformeItem::class, 'id_informe');
