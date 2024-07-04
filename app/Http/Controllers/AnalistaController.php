@@ -28,6 +28,31 @@ class AnalistaController extends Controller
             if (!$vehiculo) {
                 return response()->json(['notVehicle' => true]);
             }
+
+            $previousReport = Informe::where('id_vehiculo', $vehiculo->idvehiculo)
+                ->where('id_tipo_informe', $tipoInfo->id)
+                ->where('estado', 0)
+                ->orderBy('fecha', 'desc')
+                ->first();
+            if ($previousReport) {
+                // Calcular la fecha del próximo informe basado en el tipo de informe
+                $nextReportDate = Carbon::parse($previousReport->fecha);
+                if ($tipoInfo->nombre == 'Mensual') {
+                    $nextReportDate->addMonth();
+                } elseif ($tipoInfo->nombre == 'Trimestral') {
+                    $nextReportDate->addMonths(3);
+                } elseif ($tipoInfo->nombre == 'Anual') {
+                    $nextReportDate->addYear();
+                }
+
+                // Verificar que el nuevo informe sea después de la fecha del próximo informe
+
+                // Marcar el informe anterior como realizado
+                $previousReport->estado = 1;
+                $previousReport->save();
+            }
+
+
             $informe = new Informe();
             $informe->id_usuario = $user->idusuario;
             $informe->id_vehiculo = $vehiculo->idvehiculo;
@@ -62,9 +87,10 @@ class AnalistaController extends Controller
         // Filtra informes por la ruta si el checkbox está marcado
         $rutaCorinto = $request->input('corinto', false);
         $rutaPalmira = $request->input('palmira', false);
-        $mensual =  $request->input('mensual',false);
-        $trimestral =  $request->input('trimestral',false);
-        $anual = $request->input('anual',false);
+        $mensual = $request->input('mensual', false);
+        $trimestral = $request->input('trimestral', false);
+        $anual = $request->input('anual', false);
+        $diario = $request->input('diario', false);
         $query = Informe::query();
 
         $query->whereHas('vehiculo', function ($q) {
@@ -85,22 +111,30 @@ class AnalistaController extends Controller
                 $q->where('id_ruta', 6); // Filtra por la ruta con ID 6
             });
         }
-        if($mensual){
+        if($diario){
+            $query->whereHas('tipo_informe', function ($q) {
+                $q->where('id_tipo_informe', 1);
+            });
+        }
+        if ($mensual) {
             $query->whereHas('tipo_informe', function ($q) {
                 $q->where('id_tipo_informe', 2);
             });
         }
-        if($trimestral){
+        if ($trimestral) {
             $query->whereHas('tipo_informe', function ($q) {
                 $q->where('id_tipo_informe', 3);
             });
         }
-            if($anual){
-                $query->whereHas('tipo_informe', function ($q) {
-                    $q->where('id_tipo_informe', 4);
-                });
-            }
-        $informe = $query->orderBy('created_at', 'desc')->paginate($pagination);
+        if ($anual) {
+            $query->whereHas('tipo_informe', function ($q) {
+                $q->where('id_tipo_informe', 4);
+            });
+        }
+
+        $informe = $query->orderBy('estado', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->paginate($pagination);
         $dateInfo = [];
         $currentPage = $informe->currentPage();
         $itemsPage = $informe->perPage();
@@ -112,16 +146,19 @@ class AnalistaController extends Controller
             $vehiculo = Vehiculo::find($idvehiculo);
             $user = Users::find($iduser);
             $ruta = Ruta::find($vehiculo->id_ruta);
-
+            $idTipoInfo = $date->id_tipo_informe;
+            $tipoInfo= TipoInforme::find($idTipoInfo);
             $infoData = new stdClass();
             $infoData->idinforme = $date->idinforme;
             $infoData->fecha = $date->fecha;
             $infoData->descripcion = $date->descripcion;
             $infoData->nombreRuta = $ruta ? $ruta->descripcion : 'Ruta no encontrada';
+            $infoData->nombreInforme = $tipoInfo ? $tipoInfo->nombre : 'Ruta no encontrada';
             $infoData->usuario = $user->nombre_usuario . " " . $user->apellido;
             $infoData->interno = $vehiculo->nro_interno;
             $infoData->position = $startPosition;
-            if($date->id_tipo_informe ==1 ){
+            if ($date->id_tipo_informe == 1) {
+
                 if ($date->estado == 0) {
                     $infoData->style = 'color:red;';
                     $infoData->texto = 'Informe Diario: pendiente';
@@ -129,16 +166,16 @@ class AnalistaController extends Controller
                 } else {
                     $infoData->style = '';
                 }
-            }else if($date->id_tipo_informe ==2){
+            } else if ($date->id_tipo_informe == 2) {
                 if ($date->estado == 0) {
-                    $infoData->style = 'color:#E36000  ;';
+                    $infoData->style = 'color:red;';
                     $infoData->texto = 'Informe Mensual: pendiente';
 
                 } else {
                     $infoData->style = '';
                 }
             }
-            if($date->id_tipo_informe ==3 ){
+            if ($date->id_tipo_informe == 3) {
                 if ($date->estado == 0) {
                     $infoData->style = 'color:red;';
                     $infoData->texto = 'Informe Trimestral: pendiente';
@@ -146,9 +183,9 @@ class AnalistaController extends Controller
                 } else {
                     $infoData->style = '';
                 }
-            }else if($date->id_tipo_informe ==4){
+            } else if ($date->id_tipo_informe == 4) {
                 if ($date->estado == 0) {
-                    $infoData->style = 'color:#E36000  ;';
+                    $infoData->style = 'color:red;';
                     $infoData->texto = 'Informe Anual: pendiente';
 
                 } else {
@@ -174,15 +211,37 @@ class AnalistaController extends Controller
                 $itemDetail = Item::find($item->id_item);
                 return $itemDetail ? $itemDetail->nombre : 'Nombre no encontrado';
             });
+            $nextReport = null;
+            $lastReportDate = null;
 
+            if ($informe->id_tipo_informe !== 1) {
+                $lastReportDate =$informe->fecha;
+                $nextReport = $this->calculateNextReport(Carbon::parse($informe->fecha),$informe->id_tipo_informe)->toDateString();
+            }
             return response()->json([
                 'success' => true,
                 'desc' => $informe->descripcion,
                 'estado' => $informe->estado,
-                'items' => $itemsDetails
+                'items' => $itemsDetails,
+                'tipoInfo' => $informe->id_tipo_informe,
+                'nextReport' => $nextReport,
+                'lastReportDate'=>$lastReportDate
             ]);
         } else {
             return response()->json(['success' => false, 'error' => 'Not Found']);
+        }
+    }
+    private function calculateNextReport(Carbon $currentDate, $tipoinfo)
+    {
+        switch ($tipoinfo) {
+            case 2:
+                return $currentDate->addMonth();
+            case 3:
+                return $currentDate->addMonths(3);
+            case 4:
+                return $currentDate->addYears();
+            default:
+                return $currentDate;
         }
     }
     public function NewState(Request $request, $id)
@@ -272,7 +331,7 @@ class AnalistaController extends Controller
             $allTipoInforme = TipoInforme::all();
             $vehiculo = Vehiculo::find($informe->id_vehiculo);
             $tipoInforme = TipoInforme::find($informe->id_tipo_informe);
-            $relatedItems = InformeItem::where('id_informe',$id)->pluck('id_item')->toArray();
+            $relatedItems = InformeItem::where('id_informe', $id)->pluck('id_item')->toArray();
 
             return view('update.updateInforme', [
                 'informe' => $informe,
@@ -280,14 +339,15 @@ class AnalistaController extends Controller
                 'allTipoInforme' => $allTipoInforme,
                 'vehiculo' => $vehiculo,
                 'tipoInforme' => $tipoInforme,
-                'relatedItems'=>$relatedItems,
+                'relatedItems' => $relatedItems,
             ]);
 
         } catch (\Throwable $th) {
             //throw $th;
         }
     }
-    function updateInforme(Request $request,$id){
+    function updateInforme(Request $request, $id)
+    {
         $informe = Informe::find($id);
         if (!$informe) {
             return redirect()->route('home');
@@ -318,8 +378,8 @@ class AnalistaController extends Controller
 
         // Eliminar los ítems que ya no están seleccionados
         InformeItem::where('id_informe', $id)
-                    ->whereIn('id_item', $itemsToDelete)
-                    ->delete();
+            ->whereIn('id_item', $itemsToDelete)
+            ->delete();
 
         // Agregar los nuevos ítems seleccionados
         foreach ($itemsToAdd as $itemId) {
@@ -330,7 +390,7 @@ class AnalistaController extends Controller
             ]);
         }
 
-        return response()->json(['success'=>true]);
+        return response()->json(['success' => true]);
 
     }
 }

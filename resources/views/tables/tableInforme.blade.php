@@ -1,5 +1,5 @@
 <head>
-    @section('title', 'Alistamiento')
+    @section('title', 'Informe')
     <link rel="stylesheet" href="{{ asset('css/tManteniento.css') }}">
 
 </head>
@@ -109,88 +109,85 @@
         }
     </style>
     <div class="container mt-4">
-        <div class="card col-12" id="allDate" style="display: block">
+        <div class="card col-12" >
             <div class="cards-headers">
                 <span>
                     <img src="{{ asset('img/icons/bd.png') }}" class="iconosTable" alt="">
-                    Tabla Analista
+                    Tabla de matenimiento
                 </span>
                 @if (auth()->check() && (auth()->user()->idtipo_usuario == 1 || auth()->user()->idtipo_usuario == 4))
-                {{-- <button type="button" id="verArch" class="btn-Addnew abrir">
-                    <span>Agregar Informe</span>
-                </button> --}}
-                <a href="{{ route('crearInforme') }}" type="button" class="btn-Addnew">
+                <a href="{{ route('crearInforme') }}" type="button" class="btn-Addnew" id="registrar">
                     <span>Agregar Informe</span>
                 </a>
                 @endif
             </div>
-            <div class="row d-flex col-12">
-                <div class="container">
-                    <div class="row mt-1">
-                        <div class="col-md-6">
-                            <form id="pagination_form" action="{{ route('analistas') }}" method="get">
-                                <label for="pagination_limit" class="form-inline mb-2">
-                                    Mostrar
-                                    <select name="per_page" class="custom-select ml-2" id="pagination_limit"
-                                        onchange="document.getElementById('pagination_form').submit()">
-                                        <option value="25" @if($informe->perPage() == 25) selected @endif>25</option>
-                                        <option value="50" @if($informe->perPage() == 50) selected @endif>50</option>
-                                        <option value="75" @if($informe->perPage() == 75) selected @endif>75</option>
-                                    </select>
-                                    registros
-                                </label>
-                            </form>
-                        </div>
-                        <div class="col-md-6 text-center">
-                            <label class="form-inline" style="float: right;">Buscar:
-                                <input type="search" class="custom-select" placeholder="Dato a buscar" id="searchData">
-                            </label>
-                        </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-6">
+                    <div>
+                        <form  id="pagination_form" action="{{ route('analistas') }}" method="get">
+                            <label for="pagination_limit" class="form-inline mb-2 " style="margin-left: 15px;">mostrar
+                                <select name="per_page"  class="custom-select" id="pagination_limit" onchange="document.getElementById('pagination_form').submit()">
+                                    <option value="25" @if($informe->perPage() == 25) selected @endif>25</option>
+                                    <option value="50" @if($informe->perPage() == 50) selected @endif>50</option>
+                                    <option value="75" @if($informe->perPage() == 75) selected @endif>75</option>
+                                </select>
+                             registros</label>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6">
+                    <div>
+                        <label  class="form-inline mb-2 " style="float: right;">Buscar:
+                            <input type="search" class="custom-select" id="searchData" placeholder="Dato a buscar">
+                        </label>
+                    </div>
+                </div>
+                <form id="filter_form" action="{{ route('analistas') }}" class="form-inline d-flex" method="get">
+                    <input type="hidden" name="per_page" value="{{ $informe->perPage() }}">
+
+                    <div class="col-md-2 text-center">
+                        <label class="">Corinto</label>
+                        <input type="checkbox" name="corinto" id="checkCorinto"
+                            onchange="document.getElementById('filter_form').submit()" @if(request('corinto'))
+                            checked @endif>
                     </div>
 
-                    <form id="filter_form" action="{{ route('analistas') }}" class="form-inline d-flex" method="get">
-                        <input type="hidden" name="per_page" value="{{ $informe->perPage() }}">
+                    <div class="col-md-2 text-center">
+                        <label>Palmira</label>
+                        <input type="checkbox" name="palmira" id="checkPalmira"
+                            onchange="document.getElementById('filter_form').submit()" @if(request('palmira'))
+                            checked @endif>
+                    </div>
 
-                        <div class="col-md-2 text-center">
-                            <label class="">Corinto</label>
-                            <input type="checkbox" name="corinto" id="checkCorinto"
-                                onchange="document.getElementById('filter_form').submit()" @if(request('corinto'))
-                                checked @endif>
-                        </div>
+                    <div class="col-md-2 text-center">
+                        <label>Mensual</label>
+                        <input type="checkbox" name="mensual" id="checkMensual"
+                            onchange="document.getElementById('filter_form').submit()" @if(request('mensual'))
+                            checked @endif>
+                    </div>
 
-                        <div class="col-md-2 text-center">
-                            <label>Palmira</label>
-                            <input type="checkbox" name="palmira" id="checkPalmira"
-                                onchange="document.getElementById('filter_form').submit()" @if(request('palmira'))
-                                checked @endif>
-                        </div>
+                    <div class="col-md-2 text-center">
+                        <label>Trimestral</label>
+                        <input type="checkbox" name="trimestral" id="checkTrimestral"
+                            onchange="document.getElementById('filter_form').submit()" @if(request('trimestral'))
+                            checked @endif>
+                    </div>
 
-                        <div class="col-md-2 text-center">
-                            <label>Mensual</label>
-                            <input type="checkbox" name="mensual" id="checkMensual"
-                                onchange="document.getElementById('filter_form').submit()" @if(request('mensual'))
-                                checked @endif>
-                        </div>
+                    <div class="col-md-1.5 text-center">
+                        <label>Anual</label>
+                        <input type="checkbox" name="anual" id="checkAnual"
+                            onchange="document.getElementById('filter_form').submit()" @if(request('anual')) checked
+                            @endif>
 
-                        <div class="col-md-2 text-center">
-                            <label>Trimestral</label>
-                            <input type="checkbox" name="trimestral" id="checkTrimestral"
-                                onchange="document.getElementById('filter_form').submit()" @if(request('trimestral'))
-                                checked @endif>
-                        </div>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <label>Diario</label>
+                        <input type="checkbox" name="diario" id="checkDiario"
+                            onchange="document.getElementById('filter_form').submit()" @if(request('diario')) checked
+                            @endif>
 
-                        <div class="col-md-1.5 text-center">
-                            <label>Anual</label>
-                            <input type="checkbox" name="anual" id="checkAnual"
-                                onchange="document.getElementById('filter_form').submit()" @if(request('anual')) checked
-                                @endif>
-
-                        </div>
-
-                    </form>
-                </div>
-                <!-- Otros filtros -->
-
+                    </div>
+                </form>
             </div>
             <table class="table table-striped table-hover text-center" id="tableAnalista">
                 <thead class="theadMantenmiento">
@@ -201,6 +198,7 @@
                         <th id="fecha" class="thC">Fecha</th>
                         <th id="ruta" class="thC">Ruta</th>
                         <th id="descrip"class="thC">Descripción</th>
+                        <th id="descrip"class="thC">Tipo</th>
                         @if (auth()->check() && (auth()->user()->idtipo_usuario == 1 || auth()->user()->idtipo_usuario
                         == 4 ))
                         <th>Editar</th>
@@ -226,6 +224,9 @@
                         <td>
                             <a type="button" class="viewDesc" data-id="{{ $items->idinforme }}"><i
                                     class="bi bi-eye-fill Objets"></i></a>
+                        </td>
+                        <td>
+                            {{ $items->nombreInforme }}
                         </td>
                         @if (auth()->check() && (auth()->user()->idtipo_usuario == 1 || auth()->user()->idtipo_usuario
                         == 4 ))
@@ -312,55 +313,14 @@
             </div>
 
         </div>
-        {{-- <div class="modalDad2" id="modal2">
-            <div class="modal_content">
-                <div class="modal-header" id="mHeader">
-                    <div class="regiterTitle  text-center">
-                        <label><img src="{{ asset('img/icons/conductor.png') }}" class="iconsRg" alt="">Actualizar
-        Bitácora</label>
-    </div>
-    <span class="close cerrarMod2"> <i class="bi bi-x-circle"></i></span>
-    </div>
-    <div class="modalDad-body Content ">
-        <div class="card" style="padding: 10px">
-            <form id="formUpdate">
-                @csrf
-                <div class="row col-12">
-                    <div class="col-md-6 ">
-                        <label>Nombre Completo *</label>
-                        <input class="form-control text-center" type="text" placeholder="Ingrese Nombre"
-                            name="nombreUpdate" required>
-                    </div>
-                    <div class="col-md-6 ">
-                        <label>Apellido Completo *</label>
-                        <input class="form-control text-center" type="text" placeholder="Ingrese Apellido"
-                            name="apellidoUpdate" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label>Número de documento *</label>
-                        <input class="form-control text-center" type="text" placeholder="Numero Doc."
-                            name="documentoUpdate" readonly style="background-color: #eceeef;">
-                    </div>
-                    <div class="col-md-6 mt-4">
-                        <button type="submit" id="UpdateM" class="btnRegister">
-                            <span class="Defecto">Actualizar Motorista</span>
-                            <span class="smallText">Actualizar</span>
-                        </button>
-                        <a type="button" class="btnCancel cerrarMod2">Cancelar</a>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    </div>
-
-    </div> --}}
     @endif
     <div class="modalDad3" id="modal3">
         <div class="modal_content">
             <div class="modal-header" id="mHeader">
                 <div class="regiterTitle  text-center">
-                    <label><img src="{{ asset('img/icons/conductor.png') }}" class="iconsRg" alt="">Descripción</label>
+                    <label><img src="{{ asset('img/icons/conductor.png') }}" class="iconsRg" alt="">Descripción de informe
+                        <span class="tipoInfo"></span>
+                    </label>
                 </div>
                 <span class="close" id="cerrar"> <i class="bi bi-x-circle"></i></span>
             </div>
@@ -368,7 +328,9 @@
                 <div class="card" style="padding: 10px">
                     <div class="col-md-12 form-floating mt-2 ">
                         <div>
-                            <label>Descripción</label>
+                            <label>Descripción de informe
+                                <span class="tipoInfo"></span>
+                            </label>
                             <textarea class="form-control w-100" readonly id="description">
                                 </textarea>
                         </div>
@@ -382,20 +344,53 @@
                                 </ul>
                             </div>
 
-                            <div class="col-md-3 mt-3">
-                                <div class="form-group">
-                                    <label class="form-inline">
-                                        Estado Bitácora:
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-3 mt-3">
-                                <div class="form-group">
-                                    <input type="radio" name="state" value="0"> Pendiente
-                                    <input type="radio" name="state" value="1"> Realizado
-                                </div>
-                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div id="divState" style="display: none">
+                                        <div class="col-md-12 mt-3">
+                                            <div class="form-group">
+                                                <label class="form-inline">Estado Bitácora:</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 mt-2">
+                                            <div class="form-group">
+                                                <input type="radio" name="state" value="0"> Pendiente
+                                                <input type="radio" name="state" value="1"> Realizado
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                    <div id="divAll" style="display: none">
+                                        <div class="col-md-12 mt-3">
+                                            <div class="form-group">
+                                                <label for="">Próximo Informe <span class="tipoInfo"></span></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mt-2 mb-2">
+                                            <ul class="list-group">
+                                                <li class="list-group-item">
+                                                    <strong class="nextMant"></strong>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div id="divLastMant" style="display: none">
+                                        <div class="col-md-12 mt-3">
+                                            <div class="form-group">
+                                                <label for="">Informe <span class="tipoInfo"></span> Realizado </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mt-2 mb-2">
+                                            <ul class="list-group">
+                                                <li class="list-group-item">
+                                                    <strong class="lastMant"></strong>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

@@ -39,24 +39,73 @@ document.addEventListener('DOMContentLoaded', function () {
             url:"/route/date/desc/" + id,
             success: function (response) {
                 if (response.success) {
+                    if (response.tipoInfo) {
+                        var tipoTex =''
+
+                        switch (response.tipoInfo) {
+                            case 1:
+                                 tipoTex ='Diario'
+                                break;
+                                case 2:
+                                     tipoTex ='Mensual'
+                                    break;
+                                case 3:
+                                     tipoTex ='Trimestral'
+                                    break;
+                                case 4:
+                                     tipoTex ='Anual'
+                                    break;
+                            default:
+                                tipoTex =''
+                                break;
+
+                        }
+                        $('.tipoInfo').each(function(){
+                            $(this).text(tipoTex);
+                        })
+                        if (response.estado ==0) {
+                            $('#divAll').show();
+                            $('#divLastMant').hide();
+                            $('.nextMant').each(function() {
+                                $(this).text(response.nextReport);
+                            });
+                        }else{
+                                $('#divAll').hide();
+                                $('#divLastMant').show();
+                                $('.lastMant').each(function() {
+                                    $(this).text(response.lastReportDate);
+                                });
+                        }
+                        var itemsListHtml = '';
+                    }
                     if (response.desc) {
 
                         $('#description').text(response.desc);
+
                     }if (response.items) {
                         var itemsListHtml = '';
-                        response.items.forEach(function(item) {
-                            itemsListHtml += '<li class="list-group-item">' + item + '</li>';
-                        });
-                        $('#itemsList').html(itemsListHtml);
-                        if(response.estado==0){
-                            $('input[name="state"][value="0"]').prop('checked', true);
-                        }else{
-                            $('input[name="state"][value="1"]').prop('checked', true);
-                        }
-                        $('input[name="state"]').off('change').on('change', function() {
 
-                            updateEstado(id);
-                        });
+                            response.items.forEach(function(item) {
+                                itemsListHtml += '<li class="list-group-item col-8">' + item + '</li>';
+                            });
+                            $('#itemsList').html(itemsListHtml);
+                            if (response.tipoInfo ==1) {
+                                $('#divAll').hide();
+                                $('#divLastMant').hide();
+                                if(response.estado==0){
+                                    $('input[name="state"][value="0"]').prop('checked', true);
+                                }else{
+                                    $('input[name="state"][value="1"]').prop('checked', true);
+                                }
+                                $('input[name="state"]').off('change').on('change', function() {
+
+                                    updateEstado(id);
+                                });
+                                $('#divState').show();
+                            }else{
+                                $('#divState').hide();
+                            }
+
                     }
                 }else{
                     console.error('Error al obtener la descripción');
@@ -104,8 +153,6 @@ document.addEventListener('DOMContentLoaded', function () {
     openModal3.forEach(openModals => {
         openModals.addEventListener('click',function (){
             var id = $(this).data('id');
-            $('#description').empty();
-            $('#itemsList').empty();
             Swal.fire({
                 title: 'Cargando...',
                 text: 'Por favor Esperar',
@@ -123,8 +170,14 @@ document.addEventListener('DOMContentLoaded', function () {
         modal3.style.animationName = 'modalClose3';
         modal3.style.animationDuration = '1s'
         modal3.classList.remove('modal--show3');
+        $('#divAll').hide();
+        $('#divLastMant').hide();
+        $('#divState').hide();
         $('#description').empty();
         $('#itemsList').empty();
+        $('.tipoInfo').empty();
+        $('.nextMant').empty();
+        $('.lastMant').empty();
     });
     close.forEach(closeModal => {
         closeModal.addEventListener('click', () => {
@@ -245,13 +298,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const checkCorinto = document.getElementById("checkCorinto");
     const filterForm = document.getElementById("filter_form");
     const checkPalmira = document.getElementById("checkPalmira");
-    const filterFormp = document.getElementById("filter_formp");
     const checkMensual = document.getElementById("checkMensual");
-    const filterFormMen = document.getElementById("filter_formMen");
     const checkTrimestral = document.getElementById("checkTrimestral");
-    const filter_formTri = document.getElementById("filter_formTri");
     const checkAnual = document.getElementById("checkAnual");
-    const filter_formAn = document.getElementById("filter_formAn");
+    const checkDiario = document.getElementById("checkDiario");
+
 
 
     checkCorinto.addEventListener("change", (e) => {
@@ -273,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function () {
             timer: 3500,
             showConfirmButton: false,
         }).then(function(){
-            filterFormp.submit();
+            filterForm.submit();
         })
     })
     checkMensual.addEventListener("change", (e)=>{
@@ -284,9 +335,10 @@ document.addEventListener('DOMContentLoaded', function () {
             timer: 3500,
             showConfirmButton: false,
         }).then(function(){
-            filterFormMen.submit();
+            filterForm.submit();
         })
-    })
+    }
+)
     checkTrimestral.addEventListener("change", (e)=>{
         e.preventDefault(); // Previene el envío inmediato del formulario
         Swal.fire({
@@ -295,7 +347,18 @@ document.addEventListener('DOMContentLoaded', function () {
             timer: 3500,
             showConfirmButton: false,
         }).then(function(){
-            filter_formTri.submit();
+            filterForm.submit();
+        })
+    })
+    checkDiario.addEventListener("change", (e)=>{
+        e.preventDefault(); // Previene el envío inmediato del formulario
+        Swal.fire({
+            title: 'Cargando...',
+            text: 'Por favor Esperar',
+            timer: 3500,
+            showConfirmButton: false,
+        }).then(function(){
+            filterForm.submit();
         })
     })
     checkAnual.addEventListener("change", (e)=>{
@@ -306,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function () {
             timer: 3500,
             showConfirmButton: false,
         }).then(function(){
-            filter_formAn.submit();
+            filterForm.submit();
         })
     })
 
@@ -343,22 +406,14 @@ document.addEventListener('DOMContentLoaded', function () {
                                 text: 'Hubo un error',
                             })
                         }else{
-                            Swal.fire({
-                                title: 'Cargando...',
-                                text: 'Por favor Esperar',
-                                timer: 2500,
-                            }).then(function(){
                                 swalWithBootstrapButtons.fire({
                                     title: "Borrado",
                                     text: "La bitacora se ha Eliminado",
                                     icon: "success",
                                     showConfirmButton: false,
                                   }).then(function(){
-
-                                      location.reload();
+                                    location.reload();
                                   })
-                            })
-
                         }
                     }
                 });

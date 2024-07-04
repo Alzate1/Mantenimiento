@@ -176,11 +176,11 @@
     </div>
     <script src="{{ asset('js/createInfo.js') }}"> </script>
     <script>
-         document.addEventListener('DOMContentLoaded', function(){
+        var analista = "{{ route('analistas') }}"
             document.getElementById('volverAnalist').addEventListener('click',(e)=>{
-                window.location.href ="{{ route('analistas') }}"
+                window.location.href = analista
             })
-        })
+
 
     </script>
 

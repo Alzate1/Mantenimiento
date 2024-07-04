@@ -302,12 +302,13 @@ document.addEventListener("DOMContentLoaded", () => {
                                 title: 'Correcto',
                                 text: 'Informe registrado correctamente',
                                 showCancelButton: true,
+                                cancelButtonText:'Cancelar',
                                 confirmButtonText: "Crear nuevo informe"
                             }).then((result)=> {
                                     if (result.isConfirmed) {
                                         location.reload();
                                     }else{
-                                        window.location.href = analista;
+                                        window.location.href = analista
                                     }
                             });
                         })
@@ -318,7 +319,6 @@ document.addEventListener("DOMContentLoaded", () => {
                             title: 'Error',
                             text: 'No existe el numero de Interno',
                         });
-
                     }
                 },
                 error: function (error) {
